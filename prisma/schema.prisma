@@ -1,0 +1,533 @@
+// Dating Uygulaması - MongoDB Prisma Schema
+// Modern, ölçeklenebilir ve güvenli tasarım
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================
+// KULLANICI YÖNETİMİ
+// =============================================
+
+model User {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  uuid             String           @unique @default(uuid())
+  email            String?          @unique
+  phone            String?          @unique
+  passwordHash     String?          @map("password_hash")
+  firstName        String           @map("first_name")
+  lastName         String           @map("last_name")
+  birthDate        DateTime         @map("birth_date")
+  gender           Gender
+  cityId           String?          @map("city_id") @db.ObjectId
+  bio              String?
+  relationshipType RelationshipType @default(DATING) @map("relationship_type")
+  image            String? // User profile image (for NextAuth)
+  isAdmin          Boolean          @default(false) @map("is_admin") // Admin flag for role-based auth
+
+  // Durum bilgileri
+  isFake       Boolean   @default(false) @map("is_fake")
+  isPremium    Boolean   @default(false) @map("is_premium")
+  isActive     Boolean   @default(true) @map("is_active")
+  isBanned     Boolean   @default(false) @map("is_banned")
+  banReason    String?   @map("ban_reason")
+  banExpiresAt DateTime? @map("ban_expires_at")
+
+  // Finansal
+  coins Float @default(0)
+
+  // Tarihler
+  lastActiveAt    DateTime? @map("last_active_at")
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  phoneVerifiedAt DateTime? @map("phone_verified_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  // İlişkiler
+  city                 City?                     @relation(fields: [cityId], references: [id])
+  photos               UserPhoto[]
+  sentMessages         Message[]                 @relation("MessageSender")
+  receivedMessages     Message[]                 @relation("MessageReceiver")
+  sentGifts            GiftTransaction[]         @relation("GiftSender")
+  receivedGifts        GiftTransaction[]         @relation("GiftReceiver")
+  premiumSubscriptions UserPremiumSubscription[]
+  coinTransactions     CoinTransaction[]
+  activityLogs         UserActivityLog[]
+  deviceTokens         DeviceToken[]
+  notifications        Notification[]
+  blockedUsers         BlockedUser[]             @relation("BlockerUser")
+  blockedByUsers       BlockedUser[]             @relation("BlockedUser")
+
+  // NextAuth.js ile ilişkiler
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+// NextAuth.js Models for Authentication
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @map("user_id") @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id") @db.ObjectId
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model UserPhoto {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @map("user_id") @db.ObjectId
+  filePath     String   @map("file_path")
+  fileName     String   @map("file_name")
+  fileSize     Int?     @map("file_size")
+  mimeType     String?  @map("mime_type")
+  isPrimary    Boolean  @default(false) @map("is_primary")
+  displayOrder Int      @default(0) @map("display_order")
+  isVerified   Boolean  @default(false) @map("is_verified")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_photos")
+}
+
+model City {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  countryCode String   @default("TR") @map("country_code")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  users User[]
+
+  @@map("cities")
+}
+
+// Kullanıcı engelleme sistemi
+model BlockedUser {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  blockerId String   @map("blocker_id") @db.ObjectId
+  blockedId String   @map("blocked_id") @db.ObjectId
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  blocker User @relation("BlockerUser", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("BlockedUser", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@map("blocked_users")
+}
+
+// =============================================
+// MESAJLAŞMA SİSTEMİ (Sohbet Odası Olmadan)
+// =============================================
+
+model Conversation {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  participantIds String[] @map("participant_ids")
+  lastMessageAt  DateTime @default(now()) @map("last_message_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // İlişkiler
+  messages Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  conversationId String      @map("conversation_id") @db.ObjectId
+  senderId       String      @map("sender_id") @db.ObjectId
+  receiverId     String      @map("receiver_id") @db.ObjectId
+  messageType    MessageType @map("message_type")
+  content        String? // Metin mesajı içeriği
+  filePath       String?     @map("file_path") // Dosya yolu (resim/ses)
+  fileName       String?     @map("file_name")
+  fileSize       Int?        @map("file_size")
+  mimeType       String?     @map("mime_type")
+  giftId         String?     @map("gift_id") @db.ObjectId
+  coinsSpent     Float       @default(0) @map("coins_spent")
+
+  // Mesaj durumu
+  isRead              Boolean   @default(false) @map("is_read")
+  readAt              DateTime? @map("read_at")
+  isDeletedBySender   Boolean   @default(false) @map("is_deleted_by_sender")
+  isDeletedByReceiver Boolean   @default(false) @map("is_deleted_by_receiver")
+
+  // Raporlama durumu
+  reported     Boolean   @default(false) @map("reported")
+  reportReason String?   @map("report_reason")
+  reportedAt   DateTime? @map("reported_at")
+  reportedBy   String?   @map("reported_by") @db.ObjectId
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // İlişkiler
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver     User         @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  gift         Gift?        @relation(fields: [giftId], references: [id])
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@index([receiverId])
+  @@map("messages")
+}
+
+// =============================================
+// PREMİUM ÜYELİK YÖNETİMİ
+// =============================================
+
+model PremiumPackage {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String?
+  durationType  DurationType @map("duration_type")
+  durationValue Int          @map("duration_value")
+  price         Float
+  currency      String       @default("TRY")
+  features      String[] // Premium özelliklerin listesi
+  imagePath     String?      @map("image_path")
+  sku           String?      @unique // Google Play/App Store SKU
+  isActive      Boolean      @default(true) @map("is_active")
+  displayOrder  Int          @default(0) @map("display_order")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  subscriptions UserPremiumSubscription[]
+
+  @@map("premium_packages")
+}
+
+model UserPremiumSubscription {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String        @map("user_id") @db.ObjectId
+  packageId       String        @map("package_id") @db.ObjectId
+  transactionId   String?       @map("transaction_id")
+  startsAt        DateTime      @map("starts_at")
+  expiresAt       DateTime      @map("expires_at")
+  isActive        Boolean       @default(true) @map("is_active")
+  isAutoRenewable Boolean       @default(false) @map("is_auto_renewable")
+  paymentMethod   PaymentMethod @map("payment_method")
+  amountPaid      Float?        @map("amount_paid")
+  currency        String        @default("TRY")
+  createdAt       DateTime      @default(now()) @map("created_at")
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package PremiumPackage @relation(fields: [packageId], references: [id])
+
+  @@map("user_premium_subscriptions")
+}
+
+// =============================================
+// COİN YÖNETİMİ
+// =============================================
+
+model CoinPackage {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  coinAmount   Int      @map("coin_amount")
+  price        Float
+  currency     String   @default("TRY")
+  bonusCoins   Int      @default(0) @map("bonus_coins")
+  description  String?
+  imagePath    String?  @map("image_path")
+  sku          String?  @unique
+  isActive     Boolean  @default(true) @map("is_active")
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  transactions CoinTransaction[]
+
+  @@map("coin_packages")
+}
+
+model CoinTransaction {
+  id              String              @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String              @map("user_id") @db.ObjectId
+  transactionType CoinTransactionType @map("transaction_type")
+  amount          Float // Pozitif: eklenen, Negatif: harcanan
+  balanceAfter    Float               @map("balance_after")
+  description     String?
+  referenceType   CoinReferenceType?  @map("reference_type")
+  referenceId     String?             @map("reference_id") @db.ObjectId
+  packageId       String?             @map("package_id") @db.ObjectId
+  transactionId   String?             @map("transaction_id") // Ödeme işlem ID'si
+  createdAt       DateTime            @default(now()) @map("created_at")
+
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package CoinPackage? @relation(fields: [packageId], references: [id])
+
+  @@map("coin_transactions")
+}
+
+model CoinPrice {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  actionType ActionType @map("action_type")
+  coinCost   Float      @map("coin_cost")
+  isActive   Boolean    @default(true) @map("is_active")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  @@map("coin_prices")
+}
+
+// =============================================
+// HEDİYE SİSTEMİ
+// =============================================
+
+model Gift {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  imagePath    String   @map("image_path")
+  coinCost     Float    @map("coin_cost")
+  category     String?
+  displayOrder Int      @default(0) @map("display_order")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  transactions GiftTransaction[]
+  messages     Message[]
+
+  @@map("gifts")
+}
+
+model GiftTransaction {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  giftId     String   @map("gift_id") @db.ObjectId
+  senderId   String   @map("sender_id") @db.ObjectId
+  receiverId String   @map("receiver_id") @db.ObjectId
+  messageId  String?  @map("message_id") @db.ObjectId
+  coinsSpent Float    @map("coins_spent")
+  sentAt     DateTime @default(now()) @map("sent_at")
+
+  gift     Gift @relation(fields: [giftId], references: [id])
+  sender   User @relation("GiftSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("GiftReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@map("gift_transactions")
+}
+
+// =============================================
+// UYGULAMA AYARLARI
+// =============================================
+
+model AppSetting {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  settingKey   String   @unique @map("setting_key")
+  settingValue String?  @map("setting_value")
+  dataType     DataType @default(STRING) @map("data_type")
+  description  String?
+  isPublic     Boolean  @default(false) @map("is_public") // Mobil uygulamada görünür mü
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("app_settings")
+}
+
+// =============================================
+// RAPORLAMA VE ANALİTİK
+// =============================================
+
+model DailyStat {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  statDate          DateTime @unique @map("stat_date")
+  newRegistrations  Int      @default(0) @map("new_registrations")
+  fakeRegistrations Int      @default(0) @map("fake_registrations")
+  totalUsers        Int      @default(0) @map("total_users")
+  activeUsers       Int      @default(0) @map("active_users")
+  premiumUsers      Int      @default(0) @map("premium_users")
+  dailyRevenue      Float    @default(0) @map("daily_revenue")
+  totalRevenue      Float    @default(0) @map("total_revenue")
+  messagesSent      Int      @default(0) @map("messages_sent")
+  giftsSent         Int      @default(0) @map("gifts_sent")
+  coinsPurchased    Float    @default(0) @map("coins_purchased")
+  coinsSpent        Float    @default(0) @map("coins_spent")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@map("daily_stats")
+}
+
+model UserActivityLog {
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String       @map("user_id") @db.ObjectId
+  activityType ActivityType @map("activity_type")
+  details      Json? // Ek detaylar JSON formatında
+  ipAddress    String?      @map("ip_address")
+  userAgent    String?      @map("user_agent")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_activity_logs")
+}
+
+// =============================================
+// BİLDİRİM YÖNETİMİ
+// =============================================
+
+model DeviceToken {
+  id         String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String     @map("user_id") @db.ObjectId
+  deviceType DeviceType @map("device_type")
+  token      String
+  isActive   Boolean    @default(true) @map("is_active")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, token])
+  @@map("device_tokens")
+}
+
+model Notification {
+  id               String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String           @map("user_id") @db.ObjectId
+  title            String
+  body             String
+  notificationType NotificationType @map("notification_type")
+  data             Json? // Ek veri JSON formatında
+  isSent           Boolean          @default(false) @map("is_sent")
+  sentAt           DateTime?        @map("sent_at")
+  isRead           Boolean          @default(false) @map("is_read")
+  readAt           DateTime?        @map("read_at")
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+// =============================================
+// ENUM TANIMLARI
+// =============================================
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum RelationshipType {
+  FRIENDSHIP
+  DATING
+  BOTH
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VOICE
+  GIFT
+}
+
+enum DurationType {
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentMethod {
+  GOOGLE_PLAY
+  APP_STORE
+  CREDIT_CARD
+  MANUAL
+}
+
+enum CoinTransactionType {
+  PURCHASE
+  SPEND
+  REWARD
+  REFUND
+  ADMIN_ADD
+  ADMIN_REMOVE
+}
+
+enum CoinReferenceType {
+  MESSAGE
+  GIFT
+  PHOTO_VIEW
+  VOICE_MESSAGE
+  PURCHASE
+  DAILY_BONUS
+}
+
+enum ActionType {
+  SEND_MESSAGE
+  SEND_IMAGE
+  SEND_VOICE
+  VIEW_PHOTO
+  SEND_GIFT
+}
+
+enum DataType {
+  STRING
+  INTEGER
+  DECIMAL
+  BOOLEAN
+  JSON
+}
+
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  MESSAGE_SENT
+  MESSAGE_REPORT
+  PROFILE_UPDATE
+  PHOTO_UPLOAD
+  PURCHASE
+}
+
+enum DeviceType {
+  IOS
+  ANDROID
+}
+
+enum NotificationType {
+  MESSAGE
+  GIFT
+  MATCH
+  PREMIUM
+  SYSTEM
+}
