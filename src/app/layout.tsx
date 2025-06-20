@@ -1,11 +1,14 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
 import { TRPCProvider } from "@/lib/trpc/Provider";
 import { SessionProvider } from "@/components/SessionProvider";
 import { getAuthSession } from "@/auth";
 import {Toaster} from "sonner";
+import {Poppins} from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+})
 
 export const metadata = {
   title: "Chat App",
@@ -21,7 +24,7 @@ export default async function RootLayout({
   
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={poppins.className}>
         <SessionProvider session={session}>
           <TRPCProvider>
             <Toaster />

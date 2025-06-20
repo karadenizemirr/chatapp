@@ -308,28 +308,32 @@ export default function SendMessageContainer() {
   };
 
   return (
-    <div className="h-[90vh] flex bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+    <div className="h-[90vh] flex bg-gradient-to-br from-indigo-50/40 to-purple-50/30 overflow-hidden p-3">
       {/* Sol Panel - Kullanıcı Arama */}
-      <div className="w-80 bg-white shadow-lg rounded-r-xl flex flex-col m-2 mr-0 left-panel">
+      <div className="w-80 bg-white/90 backdrop-blur-md border border-white/50 rounded-2xl flex flex-col mr-3 left-panel overflow-hidden">
         {/* Header */}
-        <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-tr-xl">
+        <div className="p-5 border-b border-gray-100/50 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-2xl">
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-            <MessageSquareIcon className="w-5 h-5 text-primary" />
+            <div className="p-2 bg-primary/10 rounded-full">
+              <MessageSquareIcon className="w-5 h-5 text-primary" />
+            </div>
             Mesaj Gönder
           </h2>
-          <p className="text-sm text-gray-600 mt-1">Kullanıcı seçin ve mesaj gönderin</p>
+          <p className="text-sm text-gray-600 mt-2 ml-1">Kullanıcı seçin ve mesaj gönderin</p>
         </div>
 
         {/* Arama */}
-        <div className="p-4 search-container">
+        <div className="px-4 pt-4 pb-2 search-container">
           <div className="relative group">
-            <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 group-focus-within:text-primary transition-colors duration-200" />
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-8 h-8 flex items-center justify-center group-focus-within:text-primary transition-colors duration-200">
+              <SearchIcon className="w-4 h-4" />
+            </div>
             <input
               type="text"
               placeholder="Kullanıcı ara..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/30 focus:border-primary/50 focus:bg-white transition-all duration-200 outline-none"
+              className="w-full pl-10 pr-4 py-3.5 bg-gray-50/70 border-0 rounded-xl focus:ring-0 focus:bg-white/90 transition-all duration-200 outline-none placeholder:text-gray-400"
             />
             {searchTerm && (
               <button 
@@ -344,8 +348,8 @@ export default function SendMessageContainer() {
 
         {/* Seçilen Kullanıcı */}
         {selectedUser && (
-          <div className="px-4 pb-4">
-            <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-4 border border-primary/20 shadow-sm selected-user-card">
+          <div className="px-4 pb-3 pt-1">
+            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl p-4 border border-white/50 backdrop-blur-sm selected-user-card">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center ring-2 ring-white shadow-md">
@@ -393,17 +397,22 @@ export default function SendMessageContainer() {
         {/* Kullanıcı Listesi */}
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="px-4 pb-4">
-            <div className="sticky top-0 bg-white z-10 py-2">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium text-gray-700">
+            <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 py-2 px-1">
+              <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                <div className="text-sm font-medium text-gray-700 flex items-center">
+                  <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary mr-2 text-xs">
+                    {searchTerm.length >= 2 ? filteredUsers.length : realUsers.length}
+                  </span>
                   {searchTerm.length >= 2 
-                    ? `Arama Sonuçları (${filteredUsers.length})` 
-                    : `Tüm Kullanıcılar (${realUsers.length})`
+                    ? "Arama Sonuçları" 
+                    : "Tüm Kullanıcılar"
                   }
                 </div>
                 {(searchTerm.length >= 2 ? filteredUsers : realUsers).length > 0 && (
-                  <div className="text-xs text-gray-500">
-                    Mesaj göndermek için seçin
+                  <div className="text-xs text-primary">
+                    <span className="flex items-center">
+                      <MessageSquareIcon className="w-3 h-3 mr-1" /> Mesaj gönder
+                    </span>
                   </div>
                 )}
               </div>
@@ -429,7 +438,7 @@ export default function SendMessageContainer() {
                   <button
                     key={user.id}
                     onClick={() => handleSelectUser(user)}
-                    className="w-full flex items-center space-x-3 p-3 hover:bg-gray-50 rounded-xl transition-all duration-200 text-left group hover:shadow-sm user-item"
+                    className="w-full flex items-center space-x-3 p-3 hover:bg-gradient-to-r hover:from-primary/5 hover:to-white rounded-xl transition-all duration-200 text-left group border border-transparent hover:border-primary/10 user-item"
                   >
                     <div className="relative">
                       <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center group-hover:shadow-md transition-all duration-200">
@@ -478,11 +487,11 @@ export default function SendMessageContainer() {
       </div>
 
       {/* Sağ Panel - Sohbet */}
-      <div className="flex-1 flex flex-col bg-white rounded-l-xl shadow-lg m-2 ml-1 overflow-hidden right-panel">
+      <div className="flex-1 flex flex-col bg-white/90 backdrop-blur-md rounded-2xl border border-white/50 overflow-hidden right-panel">
         {selectedUser ? (
           <>
             {/* Chat Header */}
-            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border-b border-gray-100 p-5">
+            <div className="bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-white/10 p-5 rounded-t-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="relative">
@@ -540,7 +549,7 @@ export default function SendMessageContainer() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gray-50 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-br from-gray-50/50 to-white/80 custom-scrollbar">
               {messagesLoading ? (
                 <div className="flex items-center justify-center py-10">
                   <div className="flex flex-col items-center loading-container">
@@ -559,7 +568,7 @@ export default function SendMessageContainer() {
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex items-center justify-center py-10 text-gray-500">
-                  <div className="text-center bg-white p-8 rounded-xl shadow-sm border border-gray-100 max-w-sm">
+                  <div className="text-center bg-white/70 backdrop-blur-sm p-8 rounded-2xl border border-white/50 max-w-sm">
                     <div className="bg-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                       <MessageSquareIcon className="w-10 h-10 text-primary" />
                     </div>
@@ -608,8 +617,8 @@ export default function SendMessageContainer() {
                         <div
                           className={`relative max-w-xs lg:max-w-md px-4 py-3 ${
                             isMyMessage
-                              ? "bg-gradient-to-r from-primary to-secondary text-white rounded-t-2xl rounded-bl-2xl" + (!nextIsSame ? " rounded-br-md" : " rounded-br-2xl")
-                              : "bg-white shadow-sm rounded-t-2xl rounded-br-2xl" + (!nextIsSame ? " rounded-bl-md" : " rounded-bl-2xl")
+                              ? "bg-gradient-to-r from-primary to-secondary text-white rounded-2xl rounded-br-md" + (!nextIsSame ? "" : " rounded-br-2xl")
+                              : "bg-white/90 backdrop-blur-sm border border-white/70 rounded-2xl rounded-bl-md" + (!nextIsSame ? "" : " rounded-bl-2xl")
                           }`}
                         >
                           {message.messageType !== "TEXT" && (
@@ -672,8 +681,8 @@ export default function SendMessageContainer() {
             </div>
 
             {/* Message Input */}
-            <div className="bg-white border-t border-gray-100 p-4">
-              <div className="bg-gray-50 rounded-2xl p-2 shadow-sm border border-gray-100">
+            <div className="bg-white/80 backdrop-blur-md border-t border-white/20 p-4 rounded-b-2xl">
+              <div className="bg-gradient-to-r from-gray-50/80 to-white/80 rounded-xl p-2 border border-white/50">
                 <div className="flex items-end space-x-2">
                   <div className="flex space-x-1 text-gray-500">
                     <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" title="Resim gönder">
@@ -698,7 +707,7 @@ export default function SendMessageContainer() {
                       onKeyPress={handleKeyPress}
                       placeholder="Mesajınızı yazın..."
                       rows={1}
-                      className="w-full px-4 py-3 bg-white border border-gray-100 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all duration-200 resize-none shadow-sm message-input-textarea"
+                      className="w-full px-4 py-3 bg-white/90 backdrop-blur-sm border-0 rounded-xl focus:ring-0 focus:bg-white transition-all duration-200 resize-none message-input-textarea placeholder:text-gray-400"
                       style={{ minHeight: "45px", maxHeight: "120px" }}
                     />
                   </div>
@@ -717,7 +726,7 @@ export default function SendMessageContainer() {
                       }
                     }}
                     disabled={!messageText.trim() || isSending}
-                    className="p-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex-shrink-0 send-button"
+                    className="p-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex-shrink-0 send-button hover:translate-y-[-2px] active:translate-y-[0px]"
                   >
                     {isSending ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
@@ -743,18 +752,18 @@ export default function SendMessageContainer() {
           </>
         ) : (
           /* Kullanıcı Seçilmemiş */
-          <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 empty-state">
-            <div className="text-center bg-white p-10 rounded-2xl shadow-sm border border-gray-100 max-w-md mx-4">
-              <div className="bg-primary/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                <UserIcon className="w-12 h-12 text-primary" />
+                      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-indigo-50/20 to-purple-50/10 empty-state">
+            <div className="text-center bg-white/80 backdrop-blur-md p-10 rounded-3xl border border-white/50 max-w-md mx-4">
+              <div className="bg-gradient-to-br from-primary/10 to-secondary/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/50">
+                <MessageSquareIcon className="w-12 h-12 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Mesaj Göndermek İçin Kullanıcı Seçin
               </h3>
               <p className="text-gray-600 mb-6 max-w-sm mx-auto">
                 Sol panelden bir kullanıcı arayın ve sohbet başlatmak için seçin
               </p>
-              <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+              <div className="inline-flex items-center justify-center px-4 py-2 space-x-2 text-sm text-primary bg-primary/5 rounded-full border border-primary/10">
                 <SearchIcon className="w-4 h-4" />
                 <span>En az 2 karakter girerek arama yapın</span>
               </div>

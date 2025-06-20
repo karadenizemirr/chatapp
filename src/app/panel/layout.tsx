@@ -38,27 +38,8 @@ export default function PanelLayout({
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="h-16 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between lg:justify-end">
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMobileOpen(true)}
-            className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200"
-          >
-            <Menu className="w-6 h-6 text-gray-600" />
-          </button>
-
-          {/* Desktop collapse button */}
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex p-2 rounded-xl hover:bg-gray-100 transition-colors duration-200"
-          >
-            <Menu className="w-5 h-5 text-gray-600" />
-          </button>
-        </header>
-
         {/* Page Content */}
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-10">
           {children}
         </main>
       </div>

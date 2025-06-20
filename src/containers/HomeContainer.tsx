@@ -339,7 +339,7 @@ export default function HomeContainer() {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100"
+      className="min-h-screen bg-gradient-to-br from-white via-primary/5 to-secondary/10"
     >
       <div className="homeContainer grid grid-cols-12 h-screen mx-auto">
         {/* Sol Taraf - Giriş Formu */}
@@ -422,7 +422,7 @@ export default function HomeContainer() {
                   icon={<EmailIcon />}
                   required
                   autoComplete="email"
-                  inputClassName="focus:ring-2 focus:ring-secondary/50 focus:border-secondary/50 bg-gray-50/50 border-gray-200 rounded-xl h-12 transition-all duration-200"
+                  inputClassName="focus:ring-2 focus:ring-secondary focus:border-secondary bg-gray-50/50 border-gray-200 rounded-xl h-12 transition-all duration-200"
                 />
               </div>
 
@@ -435,7 +435,7 @@ export default function HomeContainer() {
                   icon={<PasswordIcon />}
                   required
                   autoComplete="current-password"
-                  inputClassName="focus:ring-2 focus:ring-secondary/50 focus:border-secondary/50 bg-gray-50/50 border-gray-200 rounded-xl h-12 transition-all duration-200"
+                  inputClassName="focus:ring-2 focus:ring-secondary focus:border-secondary bg-gray-50/50 border-gray-200 rounded-xl h-12 transition-all duration-200"
                 />
               </div>
 
@@ -448,7 +448,7 @@ export default function HomeContainer() {
 
                 <a
                   href="#"
-                  className="text-sm font-medium text-secondary hover:text-secondary/80 transition-all duration-200 hover:underline underline-offset-2"
+                  className="text-sm font-medium text-secondary hover:text-secondary/90 transition-all duration-200 hover:underline underline-offset-2 hover:text-shadow-sm"
                 >
                   Şifremi unuttum?
                 </a>
@@ -461,7 +461,7 @@ export default function HomeContainer() {
                   className={`w-full font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform shadow-lg hover:shadow-xl flex items-center justify-center space-x-3 relative overflow-hidden group ${
                     isLoading
                       ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-secondary hover:from-secondary/90 hover:to-primary/90 hover:scale-[1.02] active:scale-[0.98]"
+                      : "bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary hover:to-primary hover:scale-[1.02] active:scale-[0.98]"
                   } text-white`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
@@ -513,7 +513,7 @@ export default function HomeContainer() {
                 Yönetici desteği mi gerekiyor?{" "}
                 <a
                   href="mailto:admin@connectheart.com"
-                  className="font-semibold text-secondary hover:text-secondary/80 transition-all duration-200 hover:underline underline-offset-2"
+                  className="font-semibold text-secondary hover:text-secondary/90 transition-all duration-200 hover:underline underline-offset-2 hover:text-shadow-sm"
                 >
                   İletişime geç
                 </a>
@@ -533,12 +533,12 @@ export default function HomeContainer() {
         {/* Sağ Taraf - Animasyon ve Bilgiler */}
         <div
           ref={rightRef}
-          className="right col-span-12 md:col-span-7 bg-gradient-to-br from-secondary/60 to-thirty/80  p-10 flex flex-col justify-center items-center relative overflow-hidden border border-white/20 "
+          className="right col-span-12 md:col-span-7 bg-gradient-to-br from-secondary/80 to-primary/20  p-10 flex flex-col justify-center items-center relative overflow-hidden border border-white/20 "
         >
           {/* Enhanced Background Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 via-primary/15 to-thirty/25 z-0"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,102,0,0.1),transparent_50%)] z-0"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.1),transparent_50%)] z-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-secondary/30 via-primary/20 to-secondary/10 z-0"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(247,55,79,0.15),transparent_50%)] z-0"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(44,44,44,0.15),transparent_50%)] z-0"></div>
 
           {/* SVG Animasyonlar */}
           <div
@@ -619,7 +619,7 @@ export default function HomeContainer() {
                   Aktif Kullanıcı
                 </p>
                 <div className="w-full h-1 bg-white/20 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></div>
+                  <div className="h-full bg-gradient-to-r from-primary/80 to-secondary rounded-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></div>
                 </div>
               </div>
               <div className="stat-item bg-white/15 backdrop-blur-md p-8 rounded-2xl text-center shadow-xl border border-white/20 hover:bg-white/25 hover:shadow-2xl transition-all duration-500 group cursor-pointer transform hover:-translate-y-2">
@@ -633,7 +633,7 @@ export default function HomeContainer() {
                   Başarılı Eşleşme
                 </p>
                 <div className="w-full h-1 bg-white/20 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-pink-400 to-red-400 rounded-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-1000 delay-200"></div>
+                  <div className="h-full bg-gradient-to-r from-secondary/80 to-secondary rounded-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-1000 delay-200"></div>
                 </div>
               </div>
               <div className="stat-item bg-white/15 backdrop-blur-md p-8 rounded-2xl text-center shadow-xl border border-white/20 hover:bg-white/25 hover:shadow-2xl transition-all duration-500 group cursor-pointer transform hover:-translate-y-2">
@@ -647,7 +647,7 @@ export default function HomeContainer() {
                   Günlük Mesaj
                 </p>
                 <div className="w-full h-1 bg-white/20 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-green-400 to-teal-400 rounded-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-1000 delay-400"></div>
+                  <div className="h-full bg-gradient-to-r from-primary/60 to-primary/90 rounded-full transform -translate-x-full group-hover:translate-x-0 transition-transform duration-1000 delay-400"></div>
                 </div>
               </div>
             </div>
@@ -655,7 +655,7 @@ export default function HomeContainer() {
             {/* Özellikler - İnteraktif Kartlar */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 w-full max-w-4xl">
               <div className="feature-card animate-svg flex items-center space-x-4 bg-white/15 backdrop-blur-md p-6 rounded-xl shadow-lg border border-white/20 hover:bg-white/25 hover:shadow-2xl transition-all duration-500 group cursor-pointer relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-secondary/20 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="bg-white/20 p-3 rounded-lg group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 group-hover:bg-blue-400/30 relative z-10">
                   <AdminIcon className="w-8 h-8 text-white flex-shrink-0" />
                 </div>
@@ -669,7 +669,7 @@ export default function HomeContainer() {
                 </div>
               </div>
               <div className="feature-card animate-svg flex items-center space-x-4 bg-white/15 backdrop-blur-md p-6 rounded-xl shadow-lg border border-white/20 hover:bg-white/25 hover:shadow-2xl transition-all duration-500 group cursor-pointer relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="bg-white/20 p-3 rounded-lg group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 group-hover:bg-green-400/30 relative z-10">
                   <SecurityIcon className="w-8 h-8 text-white flex-shrink-0" />
                 </div>
@@ -683,7 +683,7 @@ export default function HomeContainer() {
                 </div>
               </div>
               <div className="feature-card animate-svg flex items-center space-x-4 bg-white/15 backdrop-blur-md p-6 rounded-xl shadow-lg border border-white/20 hover:bg-white/25 hover:shadow-2xl transition-all duration-500 group cursor-pointer relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-secondary/15 to-secondary/25 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="bg-white/20 p-3 rounded-lg group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 group-hover:bg-pink-400/30 relative z-10">
                   <MatchIcon className="w-8 h-8 text-white flex-shrink-0" />
                 </div>
@@ -697,7 +697,7 @@ export default function HomeContainer() {
                 </div>
               </div>
               <div className="feature-card animate-svg flex items-center space-x-4 bg-white/15 backdrop-blur-md p-6 rounded-xl shadow-lg border border-white/20 hover:bg-white/25 hover:shadow-2xl transition-all duration-500 group cursor-pointer relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/15 to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 <div className="bg-white/20 p-3 rounded-lg group-hover:scale-125 group-hover:rotate-6 transition-all duration-500 group-hover:bg-yellow-400/30 relative z-10">
                   <ChatIcon className="w-8 h-8 text-white flex-shrink-0" />
                 </div>
@@ -711,100 +711,16 @@ export default function HomeContainer() {
                 </div>
               </div>
             </div>
-
-            {/* Alt Butonlar - Gelişmiş Animasyonlu */}
-            <div className="flex flex-wrap justify-center gap-6 mt-8">
-              <button className="animate-svg bg-white text-gray-800 font-semibold py-5 px-10 rounded-xl hover:bg-white/95 transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 active:scale-95 shadow-xl hover:shadow-2xl border border-white/20 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <span className="flex items-center space-x-3 relative z-10">
-                  <span className="text-lg">Detaylı İstatistikler</span>
-                  <svg
-                    className="w-5 h-5 group-hover:rotate-12 group-hover:scale-125 transition-all duration-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                    />
-                  </svg>
-                </span>
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-              </button>
-              <button className="animate-svg bg-white/10 backdrop-blur-md border-2 border-white/30 text-white font-semibold py-5 px-10 rounded-xl hover:bg-white/25 hover:border-white/60 transition-all duration-500 transform hover:scale-110 hover:-translate-y-2 active:scale-95 shadow-lg hover:shadow-2xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-teal-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <span className="flex items-center space-x-3 relative z-10">
-                  <span className="text-lg">Yardım Merkezi</span>
-                  <svg
-                    className="w-5 h-5 group-hover:rotate-12 group-hover:scale-125 transition-all duration-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </span>
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-green-400 to-teal-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-              </button>
-            </div>
-
-            {/* Yeni Eklenen - Canlı Aktivite Göstergesi */}
-            <div className="mt-12 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 max-w-2xl mx-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-white font-semibold text-lg flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  <span>Canlı Aktivite</span>
-                </h3>
-                <span className="text-white/70 text-sm">Son 5 dakika</span>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-white/90">
-                  <span className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                    <span>Yeni kullanıcı kayıtları</span>
-                  </span>
-                  <span className="font-semibold">+12</span>
-                </div>
-                <div className="flex items-center justify-between text-white/90">
-                  <span className="flex items-center space-x-2">
-                    <div
-                      className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"
-                      style={{ animationDelay: "0.5s" }}
-                    ></div>
-                    <span>Aktif eşleşmeler</span>
-                  </span>
-                  <span className="font-semibold">+8</span>
-                </div>
-                <div className="flex items-center justify-between text-white/90">
-                  <span className="flex items-center space-x-2">
-                    <div
-                      className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"
-                      style={{ animationDelay: "1s" }}
-                    ></div>
-                    <span>Gönderilen mesajlar</span>
-                  </span>
-                  <span className="font-semibold">+247</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Gelişmiş Dekoratif Elementler */}
-          <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-gradient-to-br from-primary/30 to-secondary/20 blur-3xl animate-pulse"></div>
+          <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-gradient-to-br from-primary/40 to-secondary/30 blur-3xl animate-pulse"></div>
           <div
-            className="absolute bottom-10 left-10 w-40 h-40 rounded-full bg-gradient-to-tr from-secondary/25 to-thirty/15 blur-3xl animate-pulse"
+            className="absolute bottom-10 left-10 w-40 h-40 rounded-full bg-gradient-to-tr from-secondary/30 to-primary/20 blur-3xl animate-pulse"
             style={{ animationDelay: "1s" }}
           ></div>
           <div
-            className="absolute top-1/2 left-1/3 w-48 h-48 rounded-full bg-gradient-to-bl from-thirty/20 to-primary/10 blur-3xl animate-pulse"
+            className="absolute top-1/2 left-1/3 w-48 h-48 rounded-full bg-gradient-to-bl from-secondary/25 to-primary/15 blur-3xl animate-pulse"
             style={{ animationDelay: "2s" }}
           ></div>
           <div
@@ -814,23 +730,23 @@ export default function HomeContainer() {
 
           {/* Yeni Eklenen - Dinamik Parçacık Efektleri */}
           <div
-            className="absolute top-20 left-20 w-4 h-4 bg-white/30 rounded-full animate-bounce"
+            className="absolute top-20 left-20 w-4 h-4 bg-secondary/40 rounded-full animate-bounce"
             style={{ animationDelay: "0s", animationDuration: "3s" }}
           ></div>
           <div
-            className="absolute top-40 right-32 w-3 h-3 bg-blue-300/40 rounded-full animate-bounce"
+            className="absolute top-40 right-32 w-3 h-3 bg-primary/50 rounded-full animate-bounce"
             style={{ animationDelay: "1s", animationDuration: "2.5s" }}
           ></div>
           <div
-            className="absolute bottom-32 left-40 w-5 h-5 bg-pink-300/30 rounded-full animate-bounce"
+            className="absolute bottom-32 left-40 w-5 h-5 bg-secondary/35 rounded-full animate-bounce"
             style={{ animationDelay: "2s", animationDuration: "3.5s" }}
           ></div>
           <div
-            className="absolute bottom-20 right-20 w-2 h-2 bg-yellow-300/50 rounded-full animate-bounce"
+            className="absolute bottom-20 right-20 w-2 h-2 bg-primary/60 rounded-full animate-bounce"
             style={{ animationDelay: "0.5s", animationDuration: "2s" }}
           ></div>
           <div
-            className="absolute top-60 left-60 w-6 h-6 bg-purple-300/25 rounded-full animate-bounce"
+            className="absolute top-60 left-60 w-6 h-6 bg-secondary/30 rounded-full animate-bounce"
             style={{ animationDelay: "1.5s", animationDuration: "4s" }}
           ></div>
         </div>

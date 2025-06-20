@@ -1,6 +1,7 @@
 "use client";
 
 import { useTrpc } from "@/hooks/use-trpc";
+import "tw-animate-css";
 import {
   UsersIcon,
   TrendingUpIcon,
@@ -17,6 +18,7 @@ import {
   MapPinIcon,
   SmartphoneIcon,
 } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
 
 export default function PanelContainer() {
   const trpc = useTrpc();
@@ -62,14 +64,22 @@ export default function PanelContainer() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Genel bakış ve önemli istatistikler</p>
-      </div>
+      <PageHeader
+        title="Dashboard"
+        description="Genel bakış ve önemli istatistikler"
+        badge={{
+          text: "Canlı Veriler",
+          icon: <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+        }}
+        stats={[
+          { value: userStats?.totalUsers?.toLocaleString() || "0", label: "kullanıcı" },
+          { value: formatCurrency(revenueStats?.totalRevenue || 0), label: "gelir" }
+        ]}
+      />
 
       {/* Ana İstatistikler */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 hover:border-blue-200 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Toplam Kullanıcı</p>
@@ -84,7 +94,7 @@ export default function PanelContainer() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 hover:border-green-200 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Toplam Gelir</p>
@@ -95,13 +105,13 @@ export default function PanelContainer() {
                 Bu ay: {formatCurrency((revenueStats?.monthlyPremiumRevenue || 0) + (revenueStats?.monthlyCoinRevenue || 0))}
               </p>
             </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-green-50 to-green-100 rounded-lg flex items-center justify-center">
               <DollarSignIcon className="w-6 h-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 hover:border-purple-200 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Premium Kullanıcı</p>
@@ -110,13 +120,13 @@ export default function PanelContainer() {
                 {premiumStats?.activeSubscriptions || 0} aktif abonelik
               </p>
             </div>
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg flex items-center justify-center">
               <CrownIcon className="w-6 h-6 text-purple-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 hover:border-orange-200 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Aktif Kullanıcı</p>
@@ -125,7 +135,7 @@ export default function PanelContainer() {
                 {activityStats?.activeUsersLastWeek || 0} haftalık aktif
               </p>
             </div>
-            <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg flex items-center justify-center">
               <TrendingUpIcon className="w-6 h-6 text-orange-600" />
             </div>
           </div>
@@ -134,7 +144,7 @@ export default function PanelContainer() {
 
       {/* Aktivite İstatistikleri */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 hover:border-blue-200 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Toplam Mesaj</p>
@@ -146,7 +156,7 @@ export default function PanelContainer() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 hover:border-pink-200 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Toplam Hediye</p>
@@ -154,11 +164,13 @@ export default function PanelContainer() {
                 {activityStats?.totalGifts?.toLocaleString() || 0}
               </p>
             </div>
-            <GiftIcon className="w-8 h-8 text-pink-500" />
+            <div className="p-2 bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg">
+              <GiftIcon className="w-6 h-6 text-pink-500" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 hover:border-yellow-200 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Harcanan Coin</p>
@@ -166,26 +178,32 @@ export default function PanelContainer() {
                 {activityStats?.totalCoinsSpent?.toLocaleString() || 0}
               </p>
             </div>
-            <CoinsIcon className="w-8 h-8 text-yellow-500" />
+            <div className="p-2 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg">
+              <CoinsIcon className="w-6 h-6 text-yellow-500" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <div className="bg-white rounded-xl p-6 border border-gray-100 hover:border-red-200 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Fake Kullanıcı</p>
               <p className="text-2xl font-bold text-red-600">{userStats?.fakeUsers || 0}</p>
             </div>
-            <ShieldIcon className="w-8 h-8 text-red-500" />
+            <div className="p-2 bg-gradient-to-br from-red-50 to-red-100 rounded-lg">
+              <ShieldIcon className="w-6 h-6 text-red-500" />
+            </div>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Cinsiyet Dağılımı */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <PieChartIcon className="w-5 h-5 text-blue-500" />
+        <div className="bg-white rounded-xl p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center space-x-2 pb-2 border-b border-gray-100">
+            <div className="p-1.5 bg-blue-50 rounded-md">
+              <PieChartIcon className="w-5 h-5 text-blue-500" />
+            </div>
             <span>Cinsiyet Dağılımı</span>
           </h3>
           <div className="space-y-4">
@@ -218,9 +236,11 @@ export default function PanelContainer() {
         </div>
 
         {/* En Popüler Şehirler */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <MapPinIcon className="w-5 h-5 text-green-500" />
+        <div className="bg-white rounded-xl p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center space-x-2 pb-2 border-b border-gray-100">
+            <div className="p-1.5 bg-green-50 rounded-md">
+              <MapPinIcon className="w-5 h-5 text-green-500" />
+            </div>
             <span>En Popüler Şehirler</span>
           </h3>
           <div className="space-y-3">
@@ -244,9 +264,11 @@ export default function PanelContainer() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* En Aktif Kullanıcılar */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <ActivityIcon className="w-5 h-5 text-purple-500" />
+        <div className="bg-white rounded-xl p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center space-x-2 pb-2 border-b border-gray-100">
+            <div className="p-1.5 bg-purple-50 rounded-md">
+              <ActivityIcon className="w-5 h-5 text-purple-500" />
+            </div>
             <span>En Aktif Kullanıcılar</span>
           </h3>
           <div className="space-y-3">
@@ -285,9 +307,11 @@ export default function PanelContainer() {
         </div>
 
         {/* Cihaz Dağılımı */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-            <SmartphoneIcon className="w-5 h-5 text-indigo-500" />
+        <div className="bg-white rounded-xl p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center space-x-2 pb-2 border-b border-gray-100">
+            <div className="p-1.5 bg-indigo-50 rounded-md">
+              <SmartphoneIcon className="w-5 h-5 text-indigo-500" />
+            </div>
             <span>Cihaz Dağılımı</span>
           </h3>
           <div className="space-y-4">
@@ -325,9 +349,11 @@ export default function PanelContainer() {
       </div>
 
       {/* Günlük Kayıt Trendi */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-          <BarChart3Icon className="w-5 h-5 text-blue-500" />
+      <div className="bg-white rounded-xl p-6 border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-900 mb-5 flex items-center space-x-2 pb-2 border-b border-gray-100">
+          <div className="p-1.5 bg-blue-50 rounded-md">
+            <BarChart3Icon className="w-5 h-5 text-blue-500" />
+          </div>
           <span>Son Günlük Kayıtlar</span>
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
@@ -356,9 +382,11 @@ export default function PanelContainer() {
       </div>
 
       {/* Gelir Özeti */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2">
-          <DollarSignIcon className="w-5 h-5 text-green-500" />
+      <div className="bg-white rounded-xl p-6 border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center space-x-2 pb-2 border-b border-gray-100">
+          <div className="p-1.5 bg-green-50 rounded-md">
+            <DollarSignIcon className="w-5 h-5 text-green-500" />
+          </div>
           <span>Gelir Özeti</span>
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

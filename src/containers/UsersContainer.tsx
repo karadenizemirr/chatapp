@@ -17,6 +17,7 @@ import {
 import { DataTable, DataTableColumn } from "@/components/ui/datatable";
 import { useTrpc } from "@/hooks/use-trpc";
 import UserProfileDialog from "@/components/ui/UserProfileDialog";
+import { PageHeader } from "@/components";
 import {
   UserIcon,
   MailIcon,
@@ -515,24 +516,21 @@ export default function UsersContainer() {
   return (
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Kullanıcılar</h1>
-            <p className="text-gray-600 mt-1">
-              Tüm kullanıcıları görüntüleyin ve yönetin
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="bg-white rounded-lg px-4 py-2 border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-2">
-                <UserIcon className="w-5 h-5 text-gray-400" />
-                <span className="text-sm font-medium text-gray-700">
+        <PageHeader 
+          title="Kullanıcılar"
+          description="Tüm kullanıcıları görüntüleyin ve yönetin"
+          stats={[
+            { value: isLoading ? "..." : users.length.toString(), label: "kullanıcı" }
+          ]}
+          actions={(
+            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 px-4 py-2.5 flex items-center gap-2 hover:bg-white/10 transition">
+              <UserIcon className="w-4 h-4 text-white/80" />
+              <span className="text-sm font-medium text-white">
                 Toplam: {isLoading ? "..." : users.length} kullanıcı
               </span>
-              </div>
             </div>
-          </div>
-        </div>
+          )}
+        />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
