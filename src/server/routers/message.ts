@@ -268,11 +268,11 @@ export const messageRouter = router({
         userId: z.string(),
         limit: z.number().min(1).max(100).default(20),
         cursor: z.string().nullish(),
+        filterByFake: z.boolean().optional(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { userId, limit, cursor } = input;
-
+      const { userId, limit, cursor, filterByFake } = input;
       const messages = await ctx.prisma.message.findMany({
         take: limit + 1,
         cursor: cursor ? { id: cursor } : undefined,
@@ -289,6 +289,11 @@ export const messageRouter = router({
               isDeletedByReceiver: false,
             },
           ],
+          ...(filterByFake ? {
+            sender: {
+              isFake: true
+            }
+          } : {}),
         },
         orderBy: { createdAt: "desc" },
         include: {
@@ -298,6 +303,32 @@ export const messageRouter = router({
               name: true,
               imagePath: true,
               coinCost: true,
+            },
+          },
+          sender: {
+            select: {
+              id:true,
+              firstName: true,
+              lastName: true,
+              isFake: true,
+              isPremium: true,
+              photos: {
+                where: { isPrimary: true },
+                select: { id: true, filePath: true },
+                take: 1
+              }
+            },
+          },
+          receiver: {
+            select: {
+              id:true,
+              firstName: true,
+              lastName: true,
+              photos: {
+                where: { isPrimary: true },
+                select: { id: true, filePath: true },
+                take: 1
+              }
             },
           },
         },
@@ -354,6 +385,7 @@ export const messageRouter = router({
             id: true,
             firstName: true,
             lastName: true,
+            isFake:true,
             photos: {
               where: { isPrimary: true },
               select: { id: true, filePath: true },
@@ -387,6 +419,12 @@ export const messageRouter = router({
             messageType: true,
             content: true,
             createdAt: true,
+            sender: {
+              select: {
+                firstName: true,
+                lastName: true
+              }
+            }
           },
         });
 

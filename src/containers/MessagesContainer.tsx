@@ -88,6 +88,8 @@ export default function MessagesContainer() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [showOnlyFakeMessages, setShowOnlyFakeMessages] = useState(false);
+  const [showOnlyFakeConversations, setShowOnlyFakeConversations] = useState(false);
 
   const trpc = useTrpc();
   
@@ -97,6 +99,7 @@ export default function MessagesContainer() {
     isLoading: conversationsLoading,
   } = trpc.message.getConversations.useQuery({
     limit: 50,
+    filterByFake: showOnlyFakeConversations
   });
 
   // Seçilen conversation'ın mesajları
@@ -108,6 +111,7 @@ export default function MessagesContainer() {
     {
       userId: selectedConversation?.partner.id || "",
       limit: 100,
+      filterByFake: showOnlyFakeMessages,
     },
     {
       enabled: !!selectedConversation?.partner.id,
@@ -125,6 +129,8 @@ export default function MessagesContainer() {
 
   const handleBackToConversations = () => {
     setSelectedConversation(null);
+    setShowOnlyFakeMessages(false);
+    // Konuşma listesine geri dönerken fake filtresi korunur
   };
 
   const handleViewMessage = (message: Message) => {
@@ -524,18 +530,51 @@ export default function MessagesContainer() {
           {
             value: selectedConversation ? "1" : conversations.filter(c => c.unreadCount > 0).length.toString(),
             label: "okunmamış"
+          },
+          {
+            value: selectedConversation 
+              ? messages.filter(m => m.sender.isFake || m.receiver.isFake).length.toString() 
+              : conversations.filter(c => conversationsData?.fakeUserIds?.includes(c.partner.id)).length.toString(),
+            label: "fake"
           }
         ]}
         actions={
           <>
-            {selectedConversation && (
-              <button
-                onClick={handleBackToConversations}
-                className="px-4 py-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 flex items-center gap-2 hover:bg-white/20 transition duration-300 text-white"
-              >
-                <ArrowLeftIcon className="w-4 h-4" />
-                <span>Geri Dön</span>
-              </button>
+            {selectedConversation ? (
+              <>
+                <button
+                  onClick={handleBackToConversations}
+                  className="px-4 py-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 flex items-center gap-2 hover:bg-white/20 transition duration-300 text-white mr-3"
+                >
+                  <ArrowLeftIcon className="w-4 h-4" />
+                  <span>Geri Dön</span>
+                </button>
+                <div className="px-4 py-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 flex items-center gap-2 text-white">
+                  <span>Sadece Fake Mesajlar:</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer"
+                      checked={showOnlyFakeMessages}
+                      onChange={(e) => setShowOnlyFakeMessages(e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                  </label>
+                </div>
+              </>
+            ) : (
+              <div className="px-4 py-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 flex items-center gap-2 text-white">
+                <span>Sadece Fake Kullanıcılar:</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer"
+                    checked={showOnlyFakeConversations}
+                    onChange={(e) => setShowOnlyFakeConversations(e.target.checked)}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+              </div>
             )}
           </>
         }
@@ -593,7 +632,7 @@ export default function MessagesContainer() {
                           {selectedMessage.sender.isPremium && <span className="ml-1 text-yellow-500">👑</span>}
                         </div>
                         <div className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-                          <span className="px-1.5 py-0.5 bg-gray-100 rounded-md text-xs">ID: {selectedMessage.sender.id.slice(0, 8)}</span>
+                          <span className="px-1.5 py-0.5 bg-gray-100 rounded-md text-xs">ID: {selectedMessage.sender?.id.slice(0, 8)}</span>
                           {selectedMessage.sender.isFake && (
                             <span className="px-1.5 py-0.5 bg-red-100 text-red-700 rounded-md text-xs">Fake</span>
                           )}
@@ -726,7 +765,6 @@ export default function MessagesContainer() {
           </div>
         </div>
       )}
-
       {/* Data Table */}
       <div className="p-1"> {/* Inner padding for table */}
         {selectedConversation ? (
