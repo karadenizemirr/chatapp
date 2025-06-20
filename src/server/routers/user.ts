@@ -12,6 +12,71 @@ export const userRouter = router({
     return { message: "tRPC çalışıyor!" };
   }),
 
+  // Kullanıcıya fotoğraf ekleme
+  addPhoto: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+        filePath: z.string(),
+        fileName: z.string().optional(),
+        fileSize: z.number().optional(),
+        mimeType: z.string().optional(),
+        isPrimary: z.boolean().optional().default(false),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.findUnique({
+        where: { id: input.userId },
+      });
+
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Kullanıcı bulunamadı",
+        });
+      }
+
+      // Eğer bu ana fotoğraf ise, diğer tüm fotoğrafların isPrimary değerini false yap
+      if (input.isPrimary) {
+        await ctx.prisma.userPhoto.updateMany({
+          where: { userId: input.userId },
+          data: { isPrimary: false },
+        });
+      }
+
+      // En yüksek displayOrder değerini bul
+      const maxOrderPhoto = await ctx.prisma.userPhoto.findFirst({
+        where: { userId: input.userId },
+        orderBy: { displayOrder: 'desc' },
+      });
+
+      const displayOrder = maxOrderPhoto ? maxOrderPhoto.displayOrder + 1 : 0;
+
+      // Yeni fotoğrafı ekle
+      const photo = await ctx.prisma.userPhoto.create({
+        data: {
+          userId: input.userId,
+          filePath: input.filePath,
+          fileName: input.fileName || 'unknown',
+          fileSize: input.fileSize || 0,
+          mimeType: input.mimeType || 'image/jpeg',
+          isPrimary: input.isPrimary,
+          displayOrder,
+          isVerified: true, // Fake kullanıcılar için doğrudan onaylı
+        },
+      });
+
+      // Ana fotoğraf olarak atandıysa, User modeline image alanını güncelle
+      if (input.isPrimary) {
+        await ctx.prisma.user.update({
+          where: { id: input.userId },
+          data: { image: input.filePath },
+        });
+      }
+
+      return photo;
+    }),
+
   // Şehirleri getir
   getCities: publicProcedure.query(async ({ ctx }) => {
     const cities = await ctx.prisma.city.findMany({
@@ -205,6 +270,11 @@ export const userRouter = router({
         bio: z.string().max(500).optional(),
         relationshipType: z.nativeEnum(RelationshipType).default(RelationshipType.DATING),
         isFake: z.boolean().optional().default(false),
+        avatar: z.string().optional(),
+        photos: z.array(z.object({
+          url: z.string(),
+          isPrimary: z.boolean().default(false)
+        })).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -257,6 +327,7 @@ export const userRouter = router({
           relationshipType: input.relationshipType,
           isFake: input.isFake || false,
           lastActiveAt: new Date(),
+          image: input.avatar, // Profil fotoğrafı
         },
         select: {
           id: true,
@@ -268,6 +339,43 @@ export const userRouter = router({
           birthDate: true,
         },
       });
+
+      // Fotoğrafları ekle
+      if (input.photos && input.photos.length > 0) {
+        const photoPromises = input.photos.map(async (photo, index) => {
+          // Dosya adını URL'den çıkar
+          const fileName = photo.url.split('/').pop() || 'unknown';
+
+          return ctx.prisma.userPhoto.create({
+            data: {
+              userId: user.id,
+              filePath: photo.url,
+              fileName,
+              isPrimary: photo.isPrimary || (index === 0 && !input.avatar), // Avatar yoksa ilk fotoğraf ana fotoğraf olur
+              displayOrder: index,
+              isVerified: true, // Fake kullanıcılar için doğrudan onaylı
+            },
+          });
+        });
+
+        await Promise.all(photoPromises);
+      }
+
+      // Eğer avatar varsa ve photos içinde değilse, ayrı bir kayıt olarak ekle
+      if (input.avatar && (!input.photos || !input.photos.some(p => p.url === input.avatar))) {
+        const fileName = input.avatar.split('/').pop() || 'avatar';
+
+        await ctx.prisma.userPhoto.create({
+          data: {
+            userId: user.id,
+            filePath: input.avatar,
+            fileName,
+            isPrimary: true, // Avatar her zaman primary
+            displayOrder: 0,
+            isVerified: true,
+          },
+        });
+      }
 
       return user;
     }),

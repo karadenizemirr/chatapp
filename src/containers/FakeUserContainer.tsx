@@ -7,6 +7,8 @@ import { useTrpc } from "@/hooks/use-trpc";
 import { DataTable, DataTableColumn } from "@/components/ui/datatable";
 import UserProfileDialog from "@/components/ui/UserProfileDialog";
 import { PageHeader } from "@/components";
+import { FileUpload } from "@/components/ui/FileUpload/FileUpload";
+import { UploadedFile } from "@/components/ui/FileUpload/types";
 import {
   UserIcon,
   MailIcon,
@@ -60,6 +62,8 @@ interface FakeUserFormData {
   bio: string;
   cityId?: string;
   relationshipType: "DATING" | "FRIENDSHIP" | "BOTH";
+  avatar?: string;
+  photos?: string[];
 }
 
 export default function FakeUserContainer() {
@@ -74,8 +78,14 @@ export default function FakeUserContainer() {
     gender: "FEMALE",
     birthDate: "",
     bio: "",
-    relationshipType: "DATING"
+    relationshipType: "DATING",
+    avatar: "",
+    photos: []
   });
+
+  // Fotoğraf yükleme state'leri
+  const [avatarFile, setAvatarFile] = useState<UploadedFile[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<UploadedFile[]>([]);
 
   // tRPC hooks
   const trpc = useTrpc();
@@ -155,6 +165,30 @@ export default function FakeUserContainer() {
     }));
   };
 
+  // Avatar yükleme başarılı olduğunda
+  const handleAvatarUploadSuccess = (files: UploadedFile[]) => {
+    if (files.length > 0) {
+      const avatarUrl = files[0].url;
+      setAvatarFile(files);
+      setFormData(prev => ({
+        ...prev,
+        avatar: avatarUrl
+      }));
+      toast.success("Profil fotoğrafı başarıyla yüklendi");
+    }
+  };
+
+  // Galeri fotoğrafları yükleme başarılı olduğunda
+  const handlePhotosUploadSuccess = (files: UploadedFile[]) => {
+    const photoUrls = files.map(file => file.url);
+    setPhotoFiles(prev => [...prev, ...files]);
+    setFormData(prev => ({
+      ...prev,
+      photos: [...(prev.photos || []), ...photoUrls]
+    }));
+    toast.success(`${files.length} fotoğraf başarıyla yüklendi`);
+  };
+
   // Fake kullanıcı oluştur
   const handleCreateFakeUser = (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,10 +198,21 @@ export default function FakeUserContainer() {
     const [year, month, day] = formData.birthDate.split('-').map(Number);
     const birthDate = new Date(year, month - 1, day); // JavaScript'te aylar 0'dan başlar
 
+    // Fotoğraf bilgilerini oluştur - URL'leri doğrudan kullan
+    const photos = [
+      ...(formData.photos?.map(url => ({ url, isPrimary: false })) || [])
+    ];
+
+    // Rastgele benzersiz telefon numarası oluştur
+    const randomPhone = `+90${Math.floor(Math.random() * 900000000) + 5000000000}`;
+
     toast.promise(
         createUserMutation.mutateAsync({
           ...formData,
           birthDate,
+          photos,
+          // Benzersiz telefon numarası ekle
+          phone: randomPhone,
           // Fake user flag'i API tarafında ayarlanmalı
           isFake: true
         }),
@@ -183,8 +228,12 @@ export default function FakeUserContainer() {
               gender: "FEMALE",
               birthDate: "",
               bio: "",
-              relationshipType: "DATING"
+              relationshipType: "DATING",
+              avatar: "",
+              photos: []
             });
+            setAvatarFile([]);
+            setPhotoFiles([]);
             return "Fake kullanıcı başarıyla oluşturuldu";
           },
           error: (error) => {
@@ -204,7 +253,9 @@ export default function FakeUserContainer() {
       width: "250px",
       render: (value, row) => {
         const fullName = `${row.firstName} ${row.lastName}`;
-        const profileImage = row.photos?.[0]?.filePath;
+        // İlk önce primary olan fotoğrafı bul, yoksa ilk fotoğrafı kullan
+        const primaryPhoto = row.photos?.find(p => p.isPrimary);
+        const profileImage = primaryPhoto?.filePath || row.photos?.[0]?.filePath;
         return (
             <div className="flex items-center space-x-3">
               <div className="relative">
@@ -519,7 +570,7 @@ export default function FakeUserContainer() {
 
         {/* Modal: Yeni Fake Kullanıcı Oluşturma */}
         {isCreateFormOpen && (
-            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 h-screen ">
               <div className="relative bg-gradient-to-br from-white to-amber-50/50 rounded-2xl shadow-2xl w-full max-w-md border border-amber-100 overflow-hidden">
                 <div className="absolute inset-0 bg-grid-amber/[0.02] bg-[length:16px_16px]" />
                 <div className="p-6 border-b border-amber-100 relative">
@@ -539,7 +590,7 @@ export default function FakeUserContainer() {
                   </div>
                 </div>
 
-                <form onSubmit={handleCreateFakeUser} className="relative">
+                <form onSubmit={handleCreateFakeUser} className="relative max-h-[75vh] overflow-auto">
                   <div className="p-6 space-y-5">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -663,6 +714,69 @@ export default function FakeUserContainer() {
                           className="w-full px-3.5 py-2.5 bg-white border border-amber-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 shadow-sm min-h-[100px] resize-none"
                           placeholder="Kullanıcı hakkında kısa bir açıklama..."
                       ></textarea>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-amber-700 mb-1.5">Profil Fotoğrafı</label>
+                      <div className="bg-white border border-amber-200 rounded-xl p-4 shadow-sm">
+                        <FileUpload 
+                          folder="avatars"
+                          accept="image/*"
+                          multiple={false}
+                          maxSize={5 * 1024 * 1024} // 5MB
+                          onSuccess={handleAvatarUploadSuccess}
+                          buttonText="Profil Fotoğrafı Seç"
+                          dropzoneText="Profil fotoğrafını buraya sürükleyin veya seçmek için tıklayın"
+                          initialFiles={avatarFile}
+                          className="mb-4"
+                        />
+
+                        {formData.avatar && (
+                          <div className="mt-2 flex items-center justify-center">
+                            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-amber-200">
+                              <img 
+                                src={formData.avatar} 
+                                alt="Profil fotoğrafı" 
+                                className="w-full h-full object-cover" 
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-amber-700 mb-1.5">Galeri Fotoğrafları</label>
+                      <div className="bg-white border border-amber-200 rounded-xl p-4 shadow-sm">
+                        <FileUpload
+                          folder="photos"
+                          accept="image/*"
+                          multiple={true}
+                          maxFiles={5}
+                          maxSize={10 * 1024 * 1024} // 10MB
+                          onSuccess={handlePhotosUploadSuccess}
+                          buttonText="Fotoğraflar Seç"
+                          dropzoneText="Fotoğrafları buraya sürükleyin veya seçmek için tıklayın"
+                          initialFiles={photoFiles}
+                        />
+
+                        {formData.photos && formData.photos.length > 0 && (
+                          <div className="mt-4">
+                            <h4 className="text-sm font-medium text-amber-700 mb-2">Yüklenen Galeri Fotoğrafları</h4>
+                            <div className="grid grid-cols-3 gap-2">
+                              {formData.photos.map((photoUrl, index) => (
+                                <div key={index} className="aspect-square rounded-lg overflow-hidden border border-amber-200">
+                                  <img 
+                                    src={photoUrl} 
+                                    alt={`Fotoğraf ${index + 1}`} 
+                                    className="w-full h-full object-cover" 
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
